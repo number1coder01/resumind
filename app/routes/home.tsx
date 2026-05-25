@@ -2,6 +2,9 @@ import ResumeCard from "~/components/ResumeCard";
 import { resumes } from "../../constants";
 import type { Route } from "./+types/home";
 import Navbar from "~/components/Navbar";
+import { usePuterStore } from "~/lib/puter";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,9 +14,17 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { auth } = usePuterStore();
+  // logic of this explained in auth
+  const navigate = useNavigate();
+  // ab yaha we send them to auth if not authenticated and pass next as home i.e. '/'
+  useEffect(() => {
+    if (!auth.isAuthenticated) navigate('/auth?next=/');
+  }, [auth.isAuthenticated]);
   return (
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <Navbar />
+
       <section className="main-section">
         <div className="page-heading py-16">
           <h1>Track Your Applications & Resume Ratings</h1>
