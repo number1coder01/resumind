@@ -26,6 +26,12 @@ async function loadPdfJs(): Promise<any> {
   return loadPromise;
 }
 
+//REPLACING MANUAL WORKER WITH VITE'S MODERN WORKER
+// import * as pdfjsLib from "pdfjs-dist";
+// import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
 // then after loading we take screenshot of that pdf & convert it to a png
 export async function convertPdfToImage(
   file: File,

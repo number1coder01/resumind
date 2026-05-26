@@ -74,7 +74,10 @@ const Upload = () => {
         ? feedback.message.content
         : feedback.message.content[0].text;
 
-    data.feedback = JSON.parse(feedbackText);
+    // Remove markdown code block wrapping if the AI included it
+    const cleanJsonText = feedbackText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+
+    data.feedback = JSON.parse(cleanJsonText);
     await kv.set(`resume:${uuid}`, JSON.stringify(data));
     setStatusText("Analysis complete, redirecting...");
     console.log(data);
@@ -93,7 +96,13 @@ const Upload = () => {
 
     if (!file) return;
 
-    handleAnalyze({ companyName, jobTitle, jobDescription, file });
+    handleAnalyze({ companyName, jobTitle, jobDescription, file }).catch(
+      (err) => {
+        console.error("Resume analysis failed:", err);
+        setStatusText(`Error: ${err instanceof Error ? err.message : "Something went wrong"}`);
+        setIsProcessing(false);
+      },
+    );
   };
 
   return (

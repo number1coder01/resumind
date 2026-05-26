@@ -1,6 +1,8 @@
 import {type ClassValue, clsx} from "clsx";
 import {twMerge} from "tailwind-merge";
 
+// this is for Accordion -> it is the className 
+// utility function that is used to combine CSS classes 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
