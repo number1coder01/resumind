@@ -49,8 +49,17 @@ export default function Home() {
       <section className="main-section">
         <div className="page-heading py-16">
           <h1>Track Your Applications & Resume Ratings</h1>
-          <h2>Review your submissions and check AI-powered feedback.</h2>
+          {!loadingResumes && resumes?.length === 0 ? (
+            <h2>No resumes found. Upload your first resume to get feedback.</h2>
+          ) : (
+            <h2>Review your submissions and check AI-powered feedback.</h2>
+          )}
         </div>
+        {loadingResumes && (
+          <div className="flex flex-col items-center justify-center">
+            <img src="/images/resume-scan-2.gif" className="w-[200px]" />
+          </div>
+        )}
 
         {!loadingResumes && resumes.length > 0 && (
           <div className="resumes-section">
@@ -71,17 +80,15 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* map over an array of diff. kinds of resumes */}
-      {/* now instead of creating this architecture here we shift this to constants */}
-      {/* {resumes.length > 0 && (
-        <div className="resumes-section">
-          {resumes.map((resume) => (
-            <ResumeCard key={resume.id} resume={resume} />
-          ))}
-        </div>
-      )} */}
     </main>
-    // yaha par instead of fake resumes we need to map over real resumes
   );
+  //   {/* map over an array of diff. kinds of resumes */}
+  //   {/* now instead of creating this architecture here we shift this to constants */}    //   {/* {resumes.length > 0 && (
+  //     <div className="resumes-section">
+  //       {resumes.map((resume) => (
+  //         <ResumeCard key={resume.id} resume={resume} />
+  //       ))}
+  //     </div>
+  //   )} */}
+  // // yaha par instead of fake resumes we need to map over real resumes
 }
