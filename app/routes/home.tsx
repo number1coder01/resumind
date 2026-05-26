@@ -3,8 +3,8 @@ import { resumes } from "../../constants";
 import type { Route } from "./+types/home";
 import Navbar from "~/components/Navbar";
 import { usePuterStore } from "~/lib/puter";
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,13 +14,34 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const { auth } = usePuterStore();
+  const { auth, kv } = usePuterStore();
   // logic of this explained in auth
   const navigate = useNavigate();
   // ab yaha we send them to auth if not authenticated and pass next as home i.e. '/'
   useEffect(() => {
-    if (!auth.isAuthenticated) navigate('/auth?next=/');
+    if (!auth.isAuthenticated) navigate("/auth?next=/");
   }, [auth.isAuthenticated]);
+
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [loadingResumes, setLoadingResumes] = useState(false);
+
+  useEffect(() => {
+    const loadResumes = async () => {
+      setLoadingResumes(true);
+
+      const resumes = (await kv.list("resume:*", true)) as KVItem[];
+
+      const parsedResumes = resumes?.map(
+        (resume) => JSON.parse(resume.value) as Resume,
+      );
+
+      setResumes(parsedResumes || []);
+      setLoadingResumes(false);
+    };
+
+    loadResumes();
+  }, []);
+
   return (
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <Navbar />
@@ -30,17 +51,37 @@ export default function Home() {
           <h1>Track Your Applications & Resume Ratings</h1>
           <h2>Review your submissions and check AI-powered feedback.</h2>
         </div>
+
+        {!loadingResumes && resumes.length > 0 && (
+          <div className="resumes-section">
+            {resumes.map((resume) => (
+              <ResumeCard key={resume.id} resume={resume} />
+            ))}
+          </div>
+        )}
+
+        {!loadingResumes && resumes?.length === 0 && (
+          <div className="flex flex-col items-center justify-center mt-10 gap-4">
+            <Link
+              to="/upload"
+              className="primary-button w-fit text-xl font-semibold"
+            >
+              Upload Resume
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* map over an array of diff. kinds of resumes */}
       {/* now instead of creating this architecture here we shift this to constants */}
-      {resumes.length > 0 && (
+      {/* {resumes.length > 0 && (
         <div className="resumes-section">
           {resumes.map((resume) => (
             <ResumeCard key={resume.id} resume={resume} />
           ))}
         </div>
-      )}
+      )} */}
     </main>
+    // yaha par instead of fake resumes we need to map over real resumes
   );
 }
